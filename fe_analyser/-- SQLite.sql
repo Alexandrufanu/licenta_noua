@@ -1,0 +1,7 @@
+-- SQLite
+
+
+DELETE FROM builds;
+
+
+

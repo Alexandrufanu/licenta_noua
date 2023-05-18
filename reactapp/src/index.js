@@ -18,6 +18,7 @@ import {
 import ErrorPage from './pages/ErrorPage';
 import ClothesStore from './pages/ClothesStore';
 import Root from './Root';
+import Statistics from './pages/Statistics';
 
 const router = createBrowserRouter([
   {
@@ -27,24 +28,33 @@ const router = createBrowserRouter([
 
   },
   {
-      path: "/home",
-      element: <ClothesStore />,
-    },
-    {
-      path: "/api",
-      element: null,
-    },
+    path: "/home",
+    element: <ClothesStore />,
+  },
+  {
+    path: "/api",
+    element: null,
+  },
+  {
+    path: "/statistics",
+    element: <Statistics/>,
+  },
+
+
+
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
+root.render(<>
+  {/* <React.StrictMode> */}
     <RouterProvider router={router} />
 
     {/* <BrowserRouter> */}
     {/* <App /> */}
     {/* </BrowserRouter> */}
-  </React.StrictMode>
+  {/* </React.StrictMode> */}
+
+  </>
 );
 
 // If you want to start measuring performance in your app, pass a function

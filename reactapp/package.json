@@ -12,10 +12,11 @@
     "react-router-dom": "^6.11.0",
     "react-scripts": "5.0.1",
     "react-scroll": "^1.8.9",
+    "recharts": "^2.6.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "set HTTPS=true&&react-scripts start",
+    "start": "set PORT=3005 && set HTTPS=true&&react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

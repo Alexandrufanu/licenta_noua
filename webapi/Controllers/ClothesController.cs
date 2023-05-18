@@ -64,7 +64,7 @@ namespace webapi.Controllers
 
 
         [HttpGet]
-        public IEnumerable<Clothes> GetClothes( int numberOfResults)
+        public IEnumerable<Clothes> GetClothes( int numberOfResults, int testNumber = -1)
         {
 
             string connectionString = "server=localhost;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";
@@ -92,8 +92,10 @@ namespace webapi.Controllers
                 clothes.Add(new Clothes(id, name, (decimal)(price), GetImageBytes(path)));
 
 
-                Debug.WriteLine(id.ToString(), name, path);
-                Debug.WriteLine(name, path);
+                /*Debug.WriteLine(id.ToString(), name, path);
+                Debug.WriteLine(name, path);*/
+
+                Debug.WriteLine(testNumber.ToString(), testNumber.ToString(), testNumber.ToString(), testNumber.ToString());
             }
 
             connection.Close();
@@ -155,10 +157,14 @@ namespace webapi.Controllers
             // To set up env
             var imagePath = Path.Combine("C:\\Users\\AlexAsusPC\\source\\repos\\Solution1\\webapi\\", imageName);
 
-            Debug.WriteLine(imagePath);
+            /*Debug.WriteLine(imagePath);*/
             return System.IO.File.ReadAllBytes(imagePath);
         }
 
+
+        // creating a methid for returning all items from the database
+        /*[HttpGet("all")]
+        public static IEnumerable<*/
 
 
 

@@ -119,6 +119,11 @@ export default function SiteCustomiser(componentProps){
             Compress Images 
         </div>
 
+        <div>
+            Add a throttling option: 
+            maybe withc lighthouse --throttling.cpuSlowdownMultiplier=6 https://example.com
+
+        </div>
 
 
     </div>

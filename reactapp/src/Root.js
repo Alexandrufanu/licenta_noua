@@ -9,6 +9,8 @@ import "./style/Root.css"
 import { animateScroll, scroller } from 'react-scroll';
 
 
+import { useNavigate } from 'react-router-dom';
+import Statistics from "./pages/Statistics";
 
 import { useState } from "react";
 
@@ -16,7 +18,16 @@ import { useState } from "react";
 export default function Root(){
 
 
+    const navigate = useNavigate();
 
+
+    const handleStoreRedirect = () => {
+        navigate('/home');
+    };
+
+    const handleStatisticsRedirect = () => {
+        navigate('/statistics');
+      };
 
 
 
@@ -86,7 +97,31 @@ export default function Root(){
             </button>
 
             
-            
+                <div>
+
+                    <div>
+                        Using this setup:
+                    </div>
+
+                    <div className="site-chooser" onClick={handleStoreRedirect} >
+
+                        Launch the site 
+
+                        <img  alt="logo" src={require("./images/right.png")} className="icon"/>
+
+
+                    </div>
+                    <div className="site-chooser" 
+                        // onClick={handleStatisticsRedirect}
+                        onClick={() => scroller.scrollTo('statistics', { smooth: true })}
+                    >
+
+                        Get statistics
+                        <img  alt="logo" src={require("./images/trend.png")} className="icon" style={{borderRadius:"0px"}}/>
+
+                    </div>
+                </div>
+
             </div>
 
             <div className="filler">
@@ -95,7 +130,13 @@ export default function Root(){
                 .
 
             </div>
+
         </div>
+
+        <div className="statistics" id="statistics" />
+        <Statistics />
+
+
     </>)
 }
 
