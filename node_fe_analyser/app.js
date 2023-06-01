@@ -45,9 +45,13 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 
-
+// import path from 'path';
+// import logger from 'morgan';
+// import cookieParser from 'cookie-parser';
 
 const express = require('express');
+// import express from 'express';
+
 const app = express();
 const port = 3000;
 
@@ -63,18 +67,22 @@ const port = 3000;
 
 // var app = express();
 
+
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+// import indexRouter from './routes/index.js';
+// import usersRouter from './routes/users.js';
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', indexRouter);
 app.use('/users', usersRouter);

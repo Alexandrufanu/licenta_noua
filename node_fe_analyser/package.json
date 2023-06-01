@@ -2,6 +2,7 @@
   "name": "node-fe-analyser",
   "version": "0.0.0",
   "private": true,
+  
   "scripts": {
     "dev": "node ./bin/www",
     "start": "node app.js"
@@ -15,9 +16,11 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
+    "puppeteer": "^20.4.0",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "@lhci/cli": "^0.12.0"
+    "@lhci/cli": "^0.12.0",
+    "esm": "^3.2.25"
   }
 }

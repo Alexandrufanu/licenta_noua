@@ -1,12 +1,14 @@
 
-// import { cwd } from 'process';
 let path = require('path')
 var express = require('express');
 
 var router = express.Router();
 
+// import path from 'path';
+// import express from 'express';
+// import {exec} from 'child_process';
 
-
+exec = require('child_process').exec;
 
 
 /* GET home page. */
@@ -33,9 +35,10 @@ router.get('/full-report', function(req, res, next) {
 
 
 const fs = require('fs');
+// import fs from 'fs';
 
 
-const { omit } = require('lodash');
+// const { omit } = require('lodash');
 
 
 
@@ -117,7 +120,7 @@ const readFileAsync = promisify(fs.readFile);
 const {runLighthouseCI, updateLighthouseConfig, modifyLighthouseConfig } = require('../utils/lighthouse');
 
 
-const lighthousercPath = 'lighthouserc.js';
+// const lighthousercPath = 'lighthouserc.js';
 
 
 // create endpoint for running lighthouse
@@ -125,9 +128,14 @@ router.get('/run-lighthouse', async function(req, res, next) {
   try {
     console.log("running lighthouse")
 
-    updateLighthouseConfig(lighthousercPath, modifyLighthouseConfig);
+    // updateLighthouseConfig(lighthousercPath, modifyLighthouseConfig);
 
     const { stdout, stderr } = await runLighthouseCI("http://localhost:3006", {test: 34 });
+
+
+    
+
+
     res.json({ stdout, stderr });
   } catch (error) {
     console.error(error);
@@ -148,7 +156,7 @@ router.get('/skimmed-report', async function(req, res, next) {
   //   // updateLighthouseConfig(lighthousercPath, modifyLighthouseConfig);
 
   //   // const { stdout, stderr } = 
-  //   await runLighthouseCI("http://localhost:3006", {test: 34 });
+    await runLighthouseCI("http://localhost:3006", {test: 34 });
   //   // res.json({ stdout, stderr });
   // } catch (error) {
   //   console.error(error);
@@ -198,6 +206,107 @@ router.get('/skimmed-report', async function(req, res, next) {
     return res.status(500).send('Error parsing directory to JSON');
   }
 });
+
+
+
+
+
+async function runLighthouseCommand(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(`Error executing Lighthouse: ${error}`);
+        return;
+      }
+
+      resolve(stdout);
+    });
+  });
+}
+
+
+async function runLHCI() {
+  return new Promise((resolve, reject) => {
+    exec("npx lhci collect --config=lighthouserc.js  --url=http://localhost:3006", (error, stdout, stderr) => {
+      if (error) {
+        reject(`Error executing Lighthouse: ${error}`);
+        return;
+      }
+
+      resolve(stdout);
+    });
+  });
+}
+
+
+
+router.get('/get-report', async function(req, res, next) {
+
+  const runsNumber = req.query.runsNumber;
+
+  const siteTested = req.query.siteTested;
+
+  console.log(siteTested, runsNumber)
+  
+  const directoryPath = path.join(__dirname.replace("routes", ".lighthouseci"));
+
+  let responses = [];
+  
+  for (let i = 0; i < 3; i++) {
+    try {
+      // const command = `npx lighthouse ${siteTested} --chrome-flags="--no-sandbox --headless" --output=json --output-path=.lighthouseci/lhr_out${i}.json --disable-dev-shm-usage --form-factor=desktop --throttling.throughputKbps=1000 --throttling.rttMs=0 --throttling.cpuSlowdownMultiplier=1 --throttling.requestLatencyMs=0 --throttling.downloadThroughputKbps=0 --throttling.uploadThroughputKbps=0 --screenEmulation.width=1350 --screenEmulation.height=940 --screenEmulation.deviceScaleFactor=1 --screenEmulation.mobile=false --disable-full-page-screenshot=true`;
+
+      // const command = ` npx lighthouse http://localhost:3006 --chrome-flags="--no-sandbox --headless" --output=json --output-path=.lighthouseci/out0.json --disable-dev-shm-usage --form-factor=desktop --throttling.throughputKbps=1000 --throttling.rttMs=0 --throttling.cpuSlowdownMultiplier=1 --throttling.requestLatencyMs=0 --throttling.downloadThroughputKbps=0 --throttling.uploadThroughputKbps=0 --screenEmulation.width=1350 --screenEmulation.height=940 --screenEmulation.deviceScaleFactor=1 --screenEmulation.mobile=false --disable-full-page-screenshot=true`
+      // const command = `npx lighthouse http://localhost:3006 --chrome-flags="--no-sandbox --headless" --output=json --output-path=.lighthouseci/out0.json --disable-dev-shm-usage --form-factor=desktop --throttling.throughputKbps=1000 --throttling.rttMs=0 --throttling.cpuSlowdownMultiplier=1 --throttling.requestLatencyMs=0 --throttling.downloadThroughputKbps=0 --throttling.uploadThroughputKbps=0 --screenEmulation.width=1350 --screenEmulation.height=940 --screenEmulation.deviceScaleFactor=1 --screenEmulation.mobile=false --disable-full-page-screenshot=true`;
+      // const command = `npx lighthouse http://localhost:3006 --chrome-flags="--no-sandbox --headless" --output=json --output-path=.lighthouseci/out02.json --disable-dev-shm-usage --form-factor=desktop --throttling.throughputKbps=1000 --throttling.rttMs=0 --throttling.cpuSlowdownMultiplier=1 --throttling.requestLatencyMs=0 --throttling.downloadThroughputKbps=0 --throttling.uploadThroughputKbps=0 --screenEmulation.width=1350 --screenEmulation.height=940 --screenEmulation.deviceScaleFactor=1 --screenEmulation.mobile=false --disable-full-page-screenshot=true`;
+
+      const command = `npx lighthouse ${siteTested} --chrome-flags="--no-sandbox --headless" --output=json --output-path=stdout --disable-dev-shm-usage --form-factor=desktop --throttling.throughputKbps=1000 --throttling.rttMs=0 --throttling.cpuSlowdownMultiplier=1 --throttling.requestLatencyMs=0 --throttling.downloadThroughputKbps=0 --throttling.uploadThroughputKbps=0 --screenEmulation.width=1350 --screenEmulation.height=940 --screenEmulation.deviceScaleFactor=1 --screenEmulation.mobile=false --disable-full-page-screenshot=true --only-audits="network-rtt,mainthread-work-breakdown,speed-index,network-server-latency,total-blocking-time,max-potential-fid,server-response-time,interactive,bootup-time"`
+
+
+      responses.push(await runLighthouseCommand(command));
+      
+      // console.log(responses);
+      // console.log("response", i);
+      
+
+
+    } catch (error) {
+      console.error(`Error executing Lighthouse: ${error}`);
+      return res.status(500).json({ error: 'An error occurred while running Lighthouse.' });
+    }
+  }
+
+  try {
+
+    const json_list = [];
+
+    for (const response of responses) {
+
+      try {
+
+        const report = JSON.parse(response);
+        json_list.push(report);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error parsing JSON');
+      }
+    }
+
+    res.json(json_list);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Error parsing directory to JSON');
+  }
+});
+
+
+
+
+
+
+
+
+//  module.exports = router;
 
 
 
@@ -256,8 +365,10 @@ router.get('/skimmed-report', async function(req, res, next) {
 
 //   console.log(json_list)
 
+
 module.exports = router;
 
+// export default router;
 
 
 
