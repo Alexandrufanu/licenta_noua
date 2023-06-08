@@ -2,10 +2,11 @@
 
 
 import SiteCustomiser from "./components/SiteCustomiser"
+import DeviceCustomiser from "./components/DeviceCustomiser"
+
+import PerformanceCustomiser from "./components/PerformanceCustomiser";
 
 import "./style/Root.css"
-
-
 import { animateScroll, scroller } from 'react-scroll';
 
 
@@ -60,7 +61,7 @@ export default function Root(){
     function checkValidLink(link){
         // check if the link is valid
     
-        const websiteRegex = /^https?:\/\/([^\s]+\.com|localhost:\d+)$/;
+        const websiteRegex = /^https?:\/\/([^\s]+\.[^\s]+|localhost:\d+)$/;
         const valid = websiteRegex.test(link);
 
         return valid
@@ -178,7 +179,13 @@ export default function Root(){
             <SiteCustomiser  siteChosen={siteChosen} setSiteUrl={setSiteUrl}/>
             
             STH similar for chossing the device and the thorttling 
-            <SiteCustomiser  siteChosen={siteChosen} setSiteUrl={setSiteUrl}/>
+
+            <DeviceCustomiser  siteChosen={siteChosen} setSiteUrl={setSiteUrl}/>
+
+
+            <PerformanceCustomiser  siteChosen={siteChosen} setSiteUrl={setSiteUrl}/>
+
+
 
 
             <a href={`/home`}>Go to the homee</a>

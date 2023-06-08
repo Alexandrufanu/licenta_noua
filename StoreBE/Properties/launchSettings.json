@@ -1,0 +1,39 @@
+{
+  "profiles": {
+    "StoreBE": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7105;http://localhost:5238"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+	  "commandName": "Docker",
+	  "launchBrowser": true,
+	  "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+	  "httpPort": 5289,
+	  "sslPort": 7080,
+	  "useSSL": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:14008",
+      "sslPort": 44330
+    }
+  }
+}

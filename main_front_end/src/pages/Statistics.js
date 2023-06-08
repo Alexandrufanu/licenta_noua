@@ -297,14 +297,16 @@ export default  function Statistics( {trigger}) {
     
           // console.log(data.audits['network-rtt'])
           // console.log(data.audits['mainthread-work-breakdown'])
-      });}
+      })
+      }
 
     useEffect(()=>{
       
-      console.log("TRIGGER IS", trigger)
-      if (trigger > 0)
+      console.log("TRIGGER IS", trigger, )
+      if (trigger === 1)
         getReport("get-report");
-      
+      if (trigger >= 2)
+        getReport("get-report").then( () => {setCurrentSetupNumber(currentSetupNumber + 1);} )
       
       }, [trigger]
     )
@@ -374,9 +376,9 @@ export default  function Statistics( {trigger}) {
                   // };
                   // })
               
-                  console.log(listOfArrayData[i][j], get_report_audit(j, report_audits_fields[i], "numericValue").toFixed(3),  currentSetupNumber * 50 , (get_report_audit(j, report_audits_fields[i], "numericValue").toFixed(3) + currentSetupNumber * 50 ))
+                  // console.log(listOfArrayData[i][j], get_report_audit(j, report_audits_fields[i], "numericValue").toFixed(3),  currentSetupNumber * 50 , (get_report_audit(j, report_audits_fields[i], "numericValue").toFixed(3) + currentSetupNumber * 50 ))
 
-                  listOfArrayData[i][j][`setup_${ currentSetupNumber  }`] = ( parseFloat(get_report_audit(j, report_audits_fields[i], "numericValue").toFixed(3)) + 50 * currentSetupNumber ).toFixed(3)
+                  listOfArrayData[i][j][`setup_${ currentSetupNumber  }`] = ( parseFloat(get_report_audit(j, report_audits_fields[i], "numericValue").toFixed(3))  ).toFixed(3)
 
               }
             

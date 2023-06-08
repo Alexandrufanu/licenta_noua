@@ -68,7 +68,9 @@
         public IEnumerable<Clothes> GetClothes( int numberOfResults, int testNumber = -1)
         {
 
-            string connectionString = "server=localhost;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";
+            /*string connectionString = "server=localhost;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";
+*/
+            string connectionString = "server=host.docker.internal;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";
 
             MySqlConnection connection = new MySqlConnection(connectionString);
 

@@ -33,13 +33,18 @@ export default function SiteCustomiser(componentProps){
     const [props, setProps] = useState(
         // {backCache:false, browserCache:false, imageType:"blob"}
         {
+            "itemsRendered": "10",
+            "runs": "1",    
             "backendCache": false,
+            "backendCacheTime": "1",
+
             "browserCache": false,
+            "browserCacheTime": "1",
+
             "imageType": "blob",
             "ssr": false,
             "compressImages": false,
             "throttling": false,
-            "runs": "1",
             "minifyHTML": false,
             "minifyCSS": false,
             "minifyJS": false,
@@ -63,57 +68,100 @@ export default function SiteCustomiser(componentProps){
     setProps({...props, runs: event.target.value});
     };
 
+    const handleRenderChange = (event) => {
+        setProps({...props, itemsRendered: event.target.value});
+    };
+
     const handleSSRChange = () => { 
         setProps({...props, ssr:!props.ssr});
     };
 
-    console.log(componentProps)
+
+    
+    const MultipleRadionInputs = ({input}) => {
+        
+        // should have a label with the value 
+        // should have also a name from the props 
+        // [ {options:[1,2,3,22], prop: runsNumber , name:"Site site runs (for the statistics page only):"} ]
+
+        return (
+            <div className="sep">
+                
+                <div className="element-title"> 
+                    {input.name}
+                </ div>
+
+
+                {input.options.map((option) => (
+                    <label key={option}>
+                        <input
+                            type= {input.type}
+                            // type="radio"
+                            name={input.prop}
+                            value={option}
+                            checked={props[input.prop] === option}
+                            onChange={(event) => {
+                                setProps({...props, [input.prop]: event.target.value});
+                                console.log(props);
+                                console.log(input.prop)
+                            }}
+                        />
+
+                        {option}
+                    </label>
+                ))}
+            </div>
+        );
+    };
+
 
     let baseUrl
     return(<>
     <div className={componentProps.siteChosen === null ? "selector-container greyed-out" :"selector-container"}>
 
     <div className="sep">
-            Number of items rendered on the page:
+            <div className="element-title"> 
 
+                Number of items rendered on the page:
+            </div>
 
             <label>
                 <input
                 type="radio"
-                name="optionRun"
-                value="1"
-                checked={props.runs === "1"}
-                onChange={handleRunChange}
+                name="optionRenderNumber"
+                value="10"
+                checked={props.itemsRendered === "10"}
+                onChange={handleRenderChange}
                 />
                 10
             </label>
             <label>
                 <input
                 type="radio"
-                name="optionRun"
-                value="3"
-                checked={props.runs === "3"}
-                onChange={handleRunChange}
+                name="optionRenderNumber"
+                value="25"
+                checked={props.itemsRendered === "25"}
+                onChange={handleRenderChange}
                 />
                 25
             </label>
             <label>
                 <input
                 type="radio"
-                name="optionRun"
-                value="5"
-                checked={props.runs === "5"}
-                onChange={handleRunChange}
+                name="optionRenderNumber"
+                value="50"
+                checked={props.itemsRendered === "50"}
+                onChange={handleRenderChange}
                 />
                 50
             </label>
             <label>
                 <input
                 type="radio"
-                name="optionRun"
-                value="10"
-                checked={props.runs === "10"}
-                onChange={handleRunChange}
+                name="optionRenderNumber"
+                value="100"
+                checked={props.itemsRendered === "100"}
+                onChange={handleRenderChange}
                 />
                 100
             </label>
@@ -125,8 +173,11 @@ export default function SiteCustomiser(componentProps){
 
 
         <div className="sep">
-            Site site runs (for the statistics page only):
 
+            <div className="element-title"> 
+
+                Site site runs (for the statistics page only):
+            </div>
 
             <label>
                 <input
@@ -137,67 +188,6 @@ export default function SiteCustomiser(componentProps){
                 onChange={handleRunChange}
                 />
                 1
-            </label>
-            <label>
-                <input
-                type="radio"
-                name="optionRun"
-                value="3"
-                checked={props.runs === "3"}
-                onChange={handleRunChange}
-                />
-                3
-            </label>
-            <label>
-                <input
-                type="radio"
-                name="optionRun"
-                value="5"
-                checked={props.runs === "5"}
-                onChange={handleRunChange}
-                />
-                5
-            </label>
-            <label>
-                <input
-                type="radio"
-                name="optionRun"
-                value="10"
-                checked={props.runs === "10"}
-                onChange={handleRunChange}
-                />
-                10
-            </label>
-
-        </div>
-
-        <div className="sep">       
-
-            <div> 
-                Enable Backend Cache: <input
-                type="checkbox"
-                checked={props.backCache}
-                onChange={handleBackCacheChange}
-                />
-            </div>
-
-
-            <div className={!props.backCache ? 'greyed-out' : 'subelement'}>
-            <div 
-                style={{marginLeft:"15%"}}
-                >
-                Cache time (seconds):
-                </div>
-
-                <label>
-                <input
-                type="radio"
-                name="optionRun"
-                value="1"
-                checked={props.runs === "1"}
-                onChange={handleRunChange}
-                />
-                10
                 </label>
                 <label>
                     <input
@@ -207,7 +197,7 @@ export default function SiteCustomiser(componentProps){
                     checked={props.runs === "3"}
                     onChange={handleRunChange}
                     />
-                    25
+                    3
                 </label>
                 <label>
                     <input
@@ -217,7 +207,7 @@ export default function SiteCustomiser(componentProps){
                     checked={props.runs === "5"}
                     onChange={handleRunChange}
                     />
-                    50
+                    5
                 </label>
                 <label>
                     <input
@@ -227,8 +217,37 @@ export default function SiteCustomiser(componentProps){
                     checked={props.runs === "10"}
                     onChange={handleRunChange}
                     />
-                    100
+                    10
                 </label>
+
+        </div>
+
+        <div className="sep">       
+
+            
+            <div className="element-title"> 
+
+                Enable Backend Cache: <input
+                type="checkbox"
+                checked={props.backCache}
+                onChange={handleBackCacheChange}
+                />
+            </div>
+            
+
+
+            <div className={!props.backCache ? 'greyed-out' : 'subelement'}>
+            <div 
+                style={{marginLeft:"15%"}}
+                >
+
+                Cache time (seconds):
+
+                </div>
+                
+                <MultipleRadionInputs input={ {options:["1","2","3","22"], prop: "backendCacheTime" , name:"Site site runs (for the statistics page only):", type:"radio"}} />
+                
+                
 
                 Cache is a temporary storage 
             </div>
@@ -239,7 +258,7 @@ export default function SiteCustomiser(componentProps){
 
         <div className="sep">        
 
-            <div >        
+            <div className="element-title"> 
                 Enable Browser Cache: <input
                 type="checkbox"
                 checked={props.browserCache}
@@ -254,46 +273,8 @@ export default function SiteCustomiser(componentProps){
                 Cache time (seconds):
                 </div>
 
-                <label>
-                <input
-                type="radio"
-                name="optionRun"
-                value="1"
-                checked={props.runs === "1"}
-                onChange={handleRunChange}
-                />
-                10
-                </label>
-                <label>
-                    <input
-                    type="radio"
-                    name="optionRun"
-                    value="3"
-                    checked={props.runs === "3"}
-                    onChange={handleRunChange}
-                    />
-                    25
-                </label>
-                <label>
-                    <input
-                    type="radio"
-                    name="optionRun"
-                    value="5"
-                    checked={props.runs === "5"}
-                    onChange={handleRunChange}
-                    />
-                    50
-                </label>
-                <label>
-                    <input
-                    type="radio"
-                    name="optionRun"
-                    value="10"
-                    checked={props.runs === "10"}
-                    onChange={handleRunChange}
-                    />
-                    100
-                </label>
+                <MultipleRadionInputs input={ {options:["1","2","3","22"], prop: "browserCacheTime" , name:"Site site runs (for the statistics page only):",  type:"radio"}}/>
+
 
             </div>
         </div>
@@ -304,7 +285,9 @@ export default function SiteCustomiser(componentProps){
         </div>
 
         <div className="sep">
-            Use File images:
+            <div className="element-title"> 
+                Use File images:
+            </div>
 
             <label>
                 <input
@@ -335,7 +318,7 @@ export default function SiteCustomiser(componentProps){
 
         <div className="sep">
             
-            <div >        
+            <div className="element-title"> 
                 Enable Server Side Rendering (SSR)  <input
                 type="checkbox"
                 checked={props.ssr}
@@ -357,7 +340,11 @@ export default function SiteCustomiser(componentProps){
             // alignItems: "center",
         }}
         >
-            Minify:
+            <div className="element-title"> 
+
+                Minify:
+            </div>
+
                 <label>
                     <input
                     type="checkbox"
@@ -392,14 +379,16 @@ export default function SiteCustomiser(componentProps){
         </div>
 
         <div className="sep">
-            Compress Images 
+            <div className="element-title"> 
+
+                Compress Images 
+
+                GREAT IDEA WOULD BE TO ALSO GIVE STATS ON MEMORY USAGE AND CPU USAGE
+            </div>
+            
         </div>
 
-        <div>
-            Add a throttling option: 
-            maybe withc lighthouse --throttling.cpuSlowdownMultiplier=6 https://example.com
 
-        </div>
 
         Chosen props: {JSON.stringify(props)}
 
