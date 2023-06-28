@@ -19,6 +19,7 @@ import ErrorPage from './pages/ErrorPage';
 import ClothesStore from './pages/ClothesStore';
 import Root from './Root';
 import Statistics from './pages/Statistics';
+import HelpPage from './pages/HelpPage';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
     element: <ClothesStore />,
   },
   {
+    // this route is for handling the api calls
     path: "/api",
     element: null,
   },
@@ -39,6 +41,10 @@ const router = createBrowserRouter([
     path: "/statistics",
     element: <Statistics/>,
   },
+  {
+    path: "/help",
+    element: <HelpPage />
+  }
 
 
 

@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿/*using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 
-/*public class Startup
+*//*public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
@@ -49,7 +49,7 @@ using System.Diagnostics;
 
 
 
-public class Startup
+/*public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
@@ -84,6 +84,53 @@ public class Startup
         Debug.WriteLine("TEST, here, all data should be already added to the app...");
     }
 }
+*//*
+
+
+
+
+using Microsoft.Extensions.Caching.Memory;
+
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        //services.AddSingleton<IMemoryCache, MemoryCache>();  // explicit registration
+        services.AddMemoryCache(); // Add memory cache service
+
+        services.AddControllers();
+        services.AddResponseCaching();
+        services.AddCors();
+        Debug.WriteLine("SERVICES, here, all data should be already added to the app...");
+    }
+
+
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseRouting(); // This needs to be called before using CORS
+
+*//*        app.
+*//*
+        app.UseCors(builder =>
+            builder.WithOrigins("https://localhost:3006")
+            .SetIsOriginAllowedToAllowWildcardSubdomains()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
+        app.UseResponseCaching();
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+        });
+
+        Debug.WriteLine("TEST, here, all data should be already added to the app...");
+    }
+}
 
 
 
@@ -95,4 +142,4 @@ public class Startup
 
 
 
-
+*/

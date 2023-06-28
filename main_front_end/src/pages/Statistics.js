@@ -1,11 +1,44 @@
 import '../style/ClothesStore.css'; // import CSS file
 
-import { useEffect, useState, PureComponent } from 'react';
+import { useEffect, useState, PureComponent, useMemo, memo } from 'react';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, } from 'recharts';
 
 import { scroller } from 'react-scroll';
 
+
+
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  PDFViewer,
+  Canvas
+} from "@react-pdf/renderer";
+import { get } from 'react-scroll/modules/mixins/scroller';
+
+
+// const report_audits_fields = [
+//   'network-rtt', 
+//   'mainthread-work-breakdown', 'speed-index', 'network-server-latency', 
+//   "total-blocking-time", "max-potential-fid","server-response-time",
+//   "interactive",
+//   "bootup-time",
+  
+//   // FE separated from BE
+//   "CpuUsage",
+//   "MemoryUsage",
+
+
+// ]
+
+let updatedNames = { 
+  "mainthread-work-breakdown":{ title: "mainthread-work", description:"Main thread work "},
+  'network-rtt':{ title: "mainthread-work", description:"Main thread work "},
+}
+// 
 
 const GraphDropdown = ( props ) => {
   const [show, setShow] = useState(false);
@@ -25,8 +58,14 @@ const GraphDropdown = ( props ) => {
   return (
     <div>
       <h2>
-          {props.props.title} 
-        </h2>
+      
+          {
+            updatedNames.hasOwnProperty(props.props.id)?
+            <>{updatedNames[props.props.id].title}</>:
+            <>{props.props.title} </>
+
+          }
+      </h2>
       <div className='graph-details'>
       
         <button className="site-chooser site-descriptor" onClick={() => {setShow(!show)}}      > 
@@ -40,11 +79,15 @@ const GraphDropdown = ( props ) => {
       {
         show && (
           <div className="description-content">
-            <p>{props.props.description}</p>
+            {
+              updatedNames.hasOwnProperty(props.props.id)?
+              <p>{updatedNames[props.props.id].description}</p>:
+              <p>{props.props.description}</p>
+
+            }
           </div>
         )
       }
-
 
         {/* <button className="site-chooser site-descriptor" onClick={() => {setShow(!show)}}      > 
           See data as table
@@ -56,7 +99,7 @@ const GraphDropdown = ( props ) => {
       
 
 
-      <button className="site-chooser site-descriptor" onClick={() => {setShowTable(!showTable)}}      > 
+      <button className="site-chooser site-descriptor" onClick={() => {setShowTable(!showTable); console.log(props.props.data) }}      > 
           {
             showTable ? "Hide data as table" : "Show data as table"
           }
@@ -77,7 +120,7 @@ const GraphDropdown = ( props ) => {
         <tbody>
           { 
           setupIndices.map(i => (  // Create a row for each setup
-            sum = 0, length = 0,
+            sum = 0, length = 0, console.log("SETUP:", i, props.props.data), 
             <tr key={i}>
               <td>{`Setup ${i}`}</td>  
               {props.props.data.map(run => {length += 1;sum += parseFloat(run[`setup_${i}`]);return <td key={run.name}>{run[`setup_${i}`]}</td> }   )}  
@@ -89,10 +132,35 @@ const GraphDropdown = ( props ) => {
       </table>
       }
 
+
     </div>
   );
 };
 
+
+const RunList = ({ list }) => {
+
+  const [show, setShow] = useState(false);
+
+  return (
+  <>  
+    <button className="site-chooser site-descriptor" onClick={() => {setShow(!show)}}      > Runs Data    </button>
+    {show && (
+      <div className="object-list">
+          {list.map((object, index) => (
+              <div className="object-item" key={index}>
+                  <h1> Setup {index} </h1>
+                  
+                  {Object.entries(object).map(([key, value]) => (
+                      <p key={key}><strong>{key}:</strong> {String(value)}</p>
+                  ))}
+              </div>
+          ))}
+      </div>
+    )}
+  </>
+  );
+}
 
 
 
@@ -190,16 +258,50 @@ function GraphComponent(props) {
 
     console.log("DOMAIN IS SET dor the graph", props.additionalData.title)
   }
-  
-  return (<>     
-  <p>{props.additionalData.title}</p>
-  <p>{props.additionalData.descritpion}</p>
 
-  <GraphDropdown props={{title:props.additionalData.title, description:props.additionalData.descritpion, data:props.data}} />
+
+
+  const [graphDimensions, setGraphDimensions] = useState({ width: 700, height: 500 });
+
+  const handleSliderChange = (e, dimension) => {
+      const value = Number(e.target.value);
+      setGraphDimensions({...graphDimensions, [dimension]: value });
+  }
   
+  return (<div className='data-container'>     
+  {/* <p>{props.additionalData.title}</p>
+  <p>{props.additionalData.descritpion}</p> */}
+
+
+
+  <GraphDropdown props={{title:props.additionalData.title, description:props.additionalData.descritpion, data:props.data, id:props.additionalData.id}} />
+
+  <div>
+        <label>
+            Width: 
+            <input 
+                type="range"
+                min={window.innerWidth * 0.25}
+                max={window.innerWidth}
+                value={graphDimensions.width}
+                onChange={(e) => handleSliderChange(e, 'width')}
+            />
+        </label>
+        <label>
+            Height: 
+            <input 
+                type="range"
+                min={window.innerHeight * 0.25}
+                max={window.innerHeight}
+                value={graphDimensions.height}
+                onChange={(e) => handleSliderChange(e, 'height')}
+            />
+        </label>
+      </div>
+    
   <LineChart
-      width={700}
-      height={500}
+                width={graphDimensions.width}
+                height={graphDimensions.height}
       data={props.data}
       margin={{
         top: 5,
@@ -207,6 +309,7 @@ function GraphComponent(props) {
         left: 20,
         bottom: 5
       }}
+
     >
       <CartesianGrid strokeDasharray="4 4" />
       <XAxis  
@@ -226,18 +329,16 @@ function GraphComponent(props) {
       <Legend />
 
 
-      {/* <Line
-        type="monotone"
-        dataKey="setup_1" />
-
-      <Line
-        type="monotone"
-        dataKey="setup_2" /> */}
-
         {getLines(props.data).map((line) => line)}
 
     </LineChart>
-    </>
+
+
+    {/* Runs: {JSON.stringify(props.runs)} */}
+
+    <RunList list={props.runs} />
+
+    </div>
   );
 
 }
@@ -248,41 +349,82 @@ function GraphComponent(props) {
 
 
 
+function areEqual(prevProps, nextProps) {
+  // Compare only the 'trigger' prop for changes
+  return prevProps.trigger === nextProps.trigger;
+}
+
 let listOfArrayData = []
 let listOfAdditionalData = []
 
 
-export default  function Statistics( {trigger}) {
+function Statistics( {trigger, parameters}) {
     
-    // const [listOfArrayData, setListOfArrayData ]  = useState( [] )   
-    
-    // let  =  props
 
     
-    const [ currentSetupNumber, setCurrentSetupNumber ] = useState( 0 )
+    const [ currentSetupNumber, setCurrentSetupNumber ] = useState( -1 )
 
     const [ report, setReport ] = useState( null )
 
+    const [ runs, setRuns] = useState([])
+    
     // report was = {}
     // report is [ {}, {}, {} ]
 
+    let initialisedListOfArrayData = false;
+
     const report_audits_fields = [
-      'network-rtt', 'mainthread-work-breakdown', 'speed-index', 'network-server-latency', 
+      'network-rtt', 
+      'mainthread-work-breakdown', 'speed-index', 'network-server-latency', 
       "total-blocking-time", "max-potential-fid","server-response-time",
       "interactive",
-      "bootup-time"
+      "bootup-time",
+      
+      // FE separated from BE
+      "CpuUsage",
+      "MemoryUsage",
+
     
     ]
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const get_report_audit = (index, type, field) =>{
+      console.log("GET REPORT AUDIT", index, type, field, report[index].audits[type][field])
         return report[index].audits[type][field]
     }
 
     async function getReport( str_path ) {
       
       await fetch(`api/${str_path}?` + new URLSearchParams({
-        runsNumber: 1, // 500 works
-        siteTested: "http://localhost:3006"
+        // runsNumber: 1, // 500 works
+        // siteTested: "http://localhost:3006",
+        ...parameters
       }))
       .then((response) => {
           console.log(response)
@@ -302,11 +444,28 @@ export default  function Statistics( {trigger}) {
 
     useEffect(()=>{
       
-      console.log("TRIGGER IS", trigger, )
-      if (trigger === 1)
-        getReport("get-report");
-      if (trigger >= 2)
-        getReport("get-report").then( () => {setCurrentSetupNumber(currentSetupNumber + 1);} )
+        console.log("TRIGGER IS", trigger, )
+
+        if (trigger === 1)
+        {  
+          getReport("get-report-stub-data")//.then( () => {setCurrentSetupNumber(currentSetupNumber + 1);} );
+        }
+          else if (trigger >= 2)
+        {
+          // setCurrentSetupNumber(currentSetupNumber + 1)
+          getReport("get-report-stub-data").then( () => {setCurrentSetupNumber(currentSetupNumber + 1);} )
+        }
+
+        else if (trigger === -1)
+        {
+          getReport("get-report").then( () => {setCurrentSetupNumber(currentSetupNumber + 1);setRuns((prop)=>([...prop, parameters])) } );
+          // setCurrentSetupNumber(currentSetupNumber + 1);
+        }
+        else if (trigger <= -2)
+        {
+          // setCurrentSetupNumber(currentSetupNumber + 1);
+          getReport("get-report").then( () => {setCurrentSetupNumber(currentSetupNumber + 1);setRuns((prop)=>([...prop, parameters]))  } )  
+        }  
       
       }, [trigger]
     )
@@ -315,6 +474,11 @@ export default  function Statistics( {trigger}) {
     const show_stat = (lst) => {
 
         let lll = [];
+
+        console.log("SHOW STAT", lst, currentSetupNumber)
+
+        console.log("report", report)
+
         for (let i = 0; i < lst.length; i++) {
             // console.log(get_report_audit(report_audits_fields[i], "title"));
             
@@ -322,15 +486,20 @@ export default  function Statistics( {trigger}) {
             // report is [ {}, {}, {} ]
             
             // list arrays only added once
-            if (currentSetupNumber === 0)
+            if (currentSetupNumber === 0 && trigger === -1)
             {
+              console.log("added empty arr on:", listOfArrayData, listOfAdditionalData.length, initialisedListOfArrayData)
+              console.log("added additional data on:", listOfAdditionalData, listOfAdditionalData.length, initialisedListOfArrayData)
+              console.log(initialisedListOfArrayData)
+
               listOfArrayData.push([])
 
               listOfAdditionalData.push(
                 {
                   title: get_report_audit(0, report_audits_fields[i], 'title'),
                   descritpion: get_report_audit(0, report_audits_fields[i], 'description'),
-                  numericUnit: get_report_audit(0, report_audits_fields[i], 'numericUnit')
+                  numericUnit: get_report_audit(0, report_audits_fields[i], 'numericUnit'),
+                  id: get_report_audit(0, report_audits_fields[i], 'id'),
                 } 
               )
 
@@ -341,7 +510,7 @@ export default  function Statistics( {trigger}) {
                
             for(let j=0; j < report.length; j++)
             {
-              if (currentSetupNumber === 0)
+              if (currentSetupNumber === 0 && trigger === -1)
               { 
                 console.log(j);
                 console.log(get_report_audit(j, report_audits_fields[i], 'title'))
@@ -367,7 +536,7 @@ export default  function Statistics( {trigger}) {
               // console.log(listOfArrayData)
 
               // console.log(listOfArrayData[0])
-              // Should be a diferent data for each J for
+              // Should be a diferent data for each x` J for
               }else {
               
 
@@ -387,15 +556,17 @@ export default  function Statistics( {trigger}) {
 
 
         }
+        
+        initialisedListOfArrayData = true;
+        console.log("MADE TRUE: ", listOfAdditionalData)
 
-        console.log(listOfArrayData)
+        console.log("listOfArrayData: ", listOfArrayData)
+
 
         return (
 
-        <div className='graphs-container'>
-        <ul>
-            {lll}
-        </ul>
+        <div >
+        
         </div>
         );
 
@@ -417,7 +588,7 @@ export default  function Statistics( {trigger}) {
               <div className="site-chooser"
               style={{padding: "10px"}}
               >
-              <a href="/"> See full statistics </a>
+              <a href="/"> reset graphs </a>
               </div>
             </li>
 
@@ -437,17 +608,6 @@ export default  function Statistics( {trigger}) {
         {
             report === null?
             <>
-              {/* <div style={{display:"flex", 
-              justifyContent:"center",
-               flexDirection:"row", 
-              //  alignItems:"center",
-               }}>
-                <div><h1> Loading </h1></div>
-                <br/>
-                <div className='loading-spinner'></div>
-
-              </div> */}
-
             <div style={{
               display: "flex",
               justifyContent: "center",
@@ -466,49 +626,39 @@ export default  function Statistics( {trigger}) {
             
             </>:
             <>
-                Leave the user to select the consecutive runs
-
-                and each new button press is a new line in the graph !! 
 
 
                 {show_stat(report_audits_fields)}
 
-                {/* <ul>
-                    <li>
-                        {report.audits['network-rtt'].title}: {report.audits['network-rtt'].numericValue.toFixed(3)} {report.audits['network-rtt'].numericUnit} ({(report.audits['network-rtt'].numericValue/1000).toFixed(3)} seconds)
-                    </li>
-                    <li>
-                        {report.audits['mainthread-work-breakdown'].title}: {report.audits['mainthread-work-breakdown'].numericValue.toFixed(3)} {report.audits['mainthread-work-breakdown'].numericUnit} ({(report.audits['mainthread-work-breakdown'].numericValue/1000).toFixed(3)} seconds)
-
-                    </li>
-
-                </ul>*/}
             </>
         }
 
 
-        <button onClick={()=>{  getReport("skimmed-report").then(()=>setCurrentSetupNumber(currentSetupNumber + 1));  }} > Old way -> skimmed-report </button>
+        {/* <button onClick={()=>{  getReport("skimmed-report").then(()=>setCurrentSetupNumber(currentSetupNumber + 1));  }} > Old way -> skimmed-report </button>
 
 
-        <button onClick={()=>{  getReport("get-report").then(()=>setCurrentSetupNumber(currentSetupNumber + 1));  }} > __get_report </button>
+        <button onClick={()=>{  
+          getReport("get-report").then(()=>setCurrentSetupNumber(currentSetupNumber + 1));  
+          // getReport("get-report-stub-data").then(()=>setCurrentSetupNumber(currentSetupNumber + 1));
+          }} > __get_report </button>
 
 
-        <button onClick={()=>{  getReport().then(()=>setCurrentSetupNumber(currentSetupNumber + 1));  }} > ___ </button>
+        <button onClick={()=>{  getReport().then(()=>setCurrentSetupNumber(currentSetupNumber + 1));  }} > ___ </button> */}
 
         <br/> <br/> <br/>
 
 
 
 
-        {/* <Graph data={data}/>
+
+        {listOfArrayData.map((data, index) => <GraphComponent data={data}  additionalData={listOfAdditionalData[index]} runs={runs}/>)}
 
 
-        <GraphComponent data={newData} /> */}
+        {/* <PdfDoc props={props.props} /> */}
 
 
 
-        {listOfArrayData.map((data, index) => <GraphComponent data={data}  additionalData={listOfAdditionalData[index]}/>)}
-        
+
         {/* {listOfArrayData.map((data) => <GraphComponent data={data} />)} */}
 
 
@@ -516,6 +666,22 @@ export default  function Statistics( {trigger}) {
           <GraphComponent data={listOfArrayData[} /> */}
 
         </div>
+
+        <br/> <br/> <br/>
+
+
+
+        
+      
+        {/* {listOfArrayData.map((data, index) => <PdfDoc > <GraphComponent data={data}  additionalData={listOfAdditionalData[index]}/></PdfDoc >)} */}
+
+        {/* {["ASDASD"].map((data, index) => <PdfDoc input={<TestComponent/>}><TestComponent/></PdfDoc >)} */}
+
+        {/* report !== nul<PdfDoc /> */}
+{/* 
+        <PdfDocss> </PdfDocss>  
+        <PdfDocss input={<TestComponent/>}></PdfDocss> */}
+
     </body>
 
     
@@ -525,10 +691,4 @@ export default  function Statistics( {trigger}) {
 }
 
 
-
-
-
-
-
-
-
+export default memo(Statistics, areEqual )

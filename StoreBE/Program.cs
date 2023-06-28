@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddMemoryCache();
+
 builder.Services.AddResponseCaching(); // Add response caching services
 builder.Services.AddCors(); // Add CORS services
 builder.Services.AddEndpointsApiExplorer();

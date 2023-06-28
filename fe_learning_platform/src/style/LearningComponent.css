@@ -45,7 +45,7 @@
   }
   
   .content-image {
-    max-width: 100%;
+    max-width: 30%;
     height: auto;
   }
   
@@ -90,4 +90,8 @@
     border-radius: 1rem;
 
     padding: 25px;
+
+    cursor: pointer;
+
+    
   }

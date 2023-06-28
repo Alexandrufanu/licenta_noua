@@ -52,7 +52,12 @@ var cookieParser = require('cookie-parser');
 const express = require('express');
 // import express from 'express';
 
+
+
 const app = express();
+
+// app.set('view engine', 'ejs');
+
 const port = 3000;
 
 // Define a route handler for the root path

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 
 import '../style/LearningComponent.css';
 
@@ -63,7 +63,7 @@ const LearningComponent = () => {
     console.log(testNr)
 
 
-    fetch('api/Clothes?'+ new URLSearchParams({
+    fetch('api/Item?'+ new URLSearchParams({
       numberOfResults: 10, // 500 works
       testNumber: 10//testNr,
     }))
@@ -103,30 +103,86 @@ const LearningComponent = () => {
     };
 
 
+    const renderItems = (item) => {
+      return(
+      <div className='information-containter'>
+      <h2>{item.title}</h2>
+      <img src={`data:image/png;base64,${item.image}`} alt={item.title} className="content-image" />
+      <p>{item.description}</p>
+      </ div>
+      )
+    }
+
+
+
+
+      // Create an array of references for each clothing item
+  const itemRefs = useRef([]);
+  
+  // Whenever clothingItems changes, update our itemRefs array
+  useEffect(() => {
+    itemRefs.current = itemRefs.current.slice(0, clothingItems.length);
+  }, [clothingItems]);
+
+  const handleClick = (index) => {
+    itemRefs.current[index].scrollIntoView({ 
+      behavior: "smooth", 
+      block: "nearest"
+    });
+  }
+
   return (
     <div className="content">
 
     <h1>Learning React</h1>
+    <br/><br/><br/>    
 
 
-
-    {
+    {/* {
 
     productsLoaded?
-    <div className="clothing-list">{clothingItems.map(renderClothingItem)}</div>:
+    <div className="clothing-list">{clothingItems.map(renderItems)}</div>:
     <div className='center-div'><div className="loading-spinner"></div></div>
 
   }
 
 
-    {steps.map((step, ) => (
+    {clothingItems.map((step, ) => (
         <div className='information-containter'>
-        <h2>{step.title}</h2>
-        <img src={step.image} alt={step.title} className="content-image" />
+        <h2>{step.name}</h2>
+        <img src={`data:image/png;base64,${step.image}`}  alt={step.title} className="content-image" />
         <p>{step.description}</p>
+        <p>{step.content}</p>
+
         </ div>
 
-))}
+))} */}
+<h2> Chapters overview </h2>
+{productsLoaded
+        ? <div className="clothing-list">
+            {clothingItems.map((item, i) => (
+              <div key={i} onClick={() => handleClick(i)}>
+                {renderItems(item)}
+              </div>
+            ))}
+          </div>
+        : <div className='center-div'><div className="loading-spinner"></div></div>
+      }
+
+      <br/><br/><br/>      <br/><br/><br/>      <br/><br/><br/>      <br/><br/><br/>
+
+      {clothingItems.map((step, i) => (
+        <div 
+          className='information-containter'
+          ref={el => itemRefs.current[i] = el} // Assign a ref to each div
+        >
+          <h2>{step.name}</h2>
+          <img src={`data:image/png;base64,${step.image}`} alt={step.title} className="content-image" />
+          <h3>{step.description}</h3>
+          <p>{step.content}. {step.content}. {step.content}. {step.content} </p>
+        </div>
+      ))}
+
 
       
       <div className="content-navigation">

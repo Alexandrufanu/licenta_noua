@@ -5,9 +5,107 @@ import "../style/SiteCustomiser.css"
 
 // import ClothesStore from "../pages/ClothesStore"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function SiteCustomiser(componentProps){
+
+
+
+    // Hook for managing added options
+const [addedOptions, setAddedOptions] = useState([]);
+
+// Component for adding options
+const AddOptionList = () => {
+    const [newOption, setNewOption] = useState({
+        options: [],
+        prop: "",
+        name: "",
+        type: "radio"
+    });
+
+    const addOption = () => {
+
+        if (newOption.options.length !== 0 && newOption.prop !== "" && newOption.name !== "") {
+            setAddedOptions([...addedOptions, newOption]);
+            setNewOption({
+                options: [],
+                prop: "",
+                name: "",
+                type: "radio"
+            });
+        } else {
+            alert("Please fill all the fields before adding a new option");
+        }
+
+
+
+    }
+
+    const [isHidden, setIsHidden] = useState(true);
+    const toggleVisibility = () => {
+        setIsHidden(!isHidden);
+      };
+
+    return (
+        <div className="sep">
+          {!isHidden && (
+            <>
+              <input
+                placeholder="Option Name"
+                value={newOption.name}
+                className="site-chooser smaller_remove_border"
+                onChange={(e) => setNewOption({ ...newOption, name: e.target.value })}
+              />
+              <input
+                placeholder="Option Prop"
+                value={newOption.prop}
+                className="site-chooser smaller_remove_border"
+                onChange={(e) => setNewOption({ ...newOption, prop: e.target.value })}
+              />
+              <textarea
+                placeholder="Option Values (comma separated)"
+                className="site-chooser"
+                style={{ width: '60%', height: '100px', maxWidth:"100%", boxShadow:"none" }}
+                onChange={(e) => setNewOption({ ...newOption, options: e.target.value.split(',') })}
+              />
+
+            <label>
+                <input
+                type="radio"
+                name="optionType"
+                value="radio"
+                checked={newOption.type === "radio"}
+                onChange={(e) => setNewOption({ ...newOption, type: e.target.value })}
+                />
+                radio
+            </label>
+            <label>
+                <input
+                type="radio"
+                name="optionType"
+                value="checkbox"
+                checked={newOption.type === "checkbox"}
+                onChange={(e) => setNewOption({ ...newOption, type: e.target.value })}
+                />
+                checkbox
+            </label>
+
+              <button onClick={addOption} className="site-chooser">
+                Add Option
+              </button>
+            </>
+          )}
+          <button onClick={toggleVisibility} className="site-chooser">
+            {isHidden ? 'Add Extra Parametes' : 'Hide'} 
+          </button>
+        </div>
+      );
+
+    }
+
+
+
+
 
 
     let urlFormed = ""
@@ -36,10 +134,10 @@ export default function SiteCustomiser(componentProps){
             "itemsRendered": "10",
             "runs": "1",    
             "backendCache": false,
-            "backendCacheTime": "1",
+            "backendCacheTime": "2",
 
             "browserCache": false,
-            "browserCacheTime": "1",
+            "browserCacheTime": "2",
 
             "imageType": "blob",
             "ssr": false,
@@ -51,29 +149,66 @@ export default function SiteCustomiser(componentProps){
         } 
     );
 
+    useEffect(() => {
+
+        
+        componentProps.setSiteUrl(
+            (prop)=>({
+                ...prop,
+                
+                "itemsRendered": "10",
+                "runs": "1",    
+
+                "backendCache": false,
+                "backendCacheTime": "2",
+
+                "browserCache": false,
+                "browserCacheTime": "2",
+
+                "imageType": "blob",
+                "ssr": false,
+                "compressImages": false,
+                "throttling": false,
+                "minifyHTML": false,
+                "minifyCSS": false,
+                "minifyJS": false,
+            })
+            )
+        }, []
+    
+        )
+
+
     const handleBackCacheChange = () => {
-        setProps({...props, backCache:!props.backCache});
-        componentProps.setSiteUrl("TEST")
+        setProps({...props, backendCache:!props.backendCache});
+        componentProps.setSiteUrl( (prop)=>({...prop,  backendCache:!props.backendCache}))
+
     };
     const handleBrowserCacheChange = () => {
         setProps({...props, browserCache:!props.browserCache});
+        componentProps.setSiteUrl( (prop)=>({...prop,  browserCache:!props.browserCache}))
     };
 
 
     const handleImageTypeChange = (event) => {
         setProps({...props, imageType: event.target.value});
+        componentProps.setSiteUrl( (prop)=>({...prop,  imageType:event.target.value}))
       };
 
     const handleRunChange = (event) => {
-    setProps({...props, runs: event.target.value});
+        setProps({...props, runs: event.target.value});
+        componentProps.setSiteUrl( (prop)=>({...prop,  runs:event.target.value}))
+        
     };
 
     const handleRenderChange = (event) => {
         setProps({...props, itemsRendered: event.target.value});
+        componentProps.setSiteUrl( (prop)=>({...prop,  itemsRendered:event.target.value}))
     };
 
     const handleSSRChange = () => { 
         setProps({...props, ssr:!props.ssr});
+        componentProps.setSiteUrl( (prop)=>({...prop,  ssr:!props.ssr}))
     };
 
 
@@ -92,24 +227,31 @@ export default function SiteCustomiser(componentProps){
                 </ div>
 
 
-                {input.options.map((option) => (
-                    <label key={option}>
+            {input.options.map((option) => {
+                const optionValue = Array.isArray(option) ? option[0] : option;
+                const optionLabel = Array.isArray(option) ? option[1] : option;
+
+                return (
+                    <label key={optionValue}>
                         <input
-                            type= {input.type}
-                            // type="radio"
+                            type={input.type}
                             name={input.prop}
-                            value={option}
-                            checked={props[input.prop] === option}
+                            value={optionValue}
+                            checked={props[input.prop] === optionValue}
                             onChange={(event) => {
                                 setProps({...props, [input.prop]: event.target.value});
-                                console.log(props);
-                                console.log(input.prop)
+
+                                componentProps.setSiteUrl( (prop)=>({...prop, [input.prop]: event.target.value}))
                             }}
                         />
 
-                        {option}
+                        {optionLabel}
                     </label>
-                ))}
+                );
+            })}
+            
+
+
             </div>
         );
     };
@@ -117,7 +259,11 @@ export default function SiteCustomiser(componentProps){
 
     let baseUrl
     return(<>
+    
+    <h2 className={componentProps.siteChosen === null ? "greyed-out-normal-font" :""} style={{"marginBottom":"-60px", "color":"black"}}>Site Customiser</h2>
+
     <div className={componentProps.siteChosen === null ? "selector-container greyed-out" :"selector-container"}>
+    
 
     <div className="sep">
             <div className="element-title"> 
@@ -193,31 +339,31 @@ export default function SiteCustomiser(componentProps){
                     <input
                     type="radio"
                     name="optionRun"
-                    value="3"
-                    checked={props.runs === "3"}
+                    value="4"
+                    checked={props.runs === "4"}
                     onChange={handleRunChange}
                     />
-                    3
+                    4
                 </label>
                 <label>
                     <input
                     type="radio"
                     name="optionRun"
-                    value="5"
-                    checked={props.runs === "5"}
+                    value="8"
+                    checked={props.runs === "8"}
                     onChange={handleRunChange}
                     />
-                    5
+                    8
                 </label>
                 <label>
                     <input
                     type="radio"
                     name="optionRun"
-                    value="10"
-                    checked={props.runs === "10"}
+                    value="16"
+                    checked={props.runs === "16"}
                     onChange={handleRunChange}
                     />
-                    10
+                    16
                 </label>
 
         </div>
@@ -229,23 +375,21 @@ export default function SiteCustomiser(componentProps){
 
                 Enable Backend Cache: <input
                 type="checkbox"
-                checked={props.backCache}
+                checked={props.backendCache}
                 onChange={handleBackCacheChange}
                 />
             </div>
             
 
 
-            <div className={!props.backCache ? 'greyed-out' : 'subelement'}>
+            <div className={!props.backendCache ? 'greyed-out' : 'subelement'}>
             <div 
                 style={{marginLeft:"15%"}}
                 >
 
-                Cache time (seconds):
-
                 </div>
                 
-                <MultipleRadionInputs input={ {options:["1","2","3","22"], prop: "backendCacheTime" , name:"Site site runs (for the statistics page only):", type:"radio"}} />
+                <MultipleRadionInputs input={ {options:[["2", "first 2 runs"], ["50%", "50% of the runs"],["75%", "75% of the runs"], ["100%","whole test"]], prop: "backendCacheTime" , name:"Site site runs (for the statistics page only):", type:"radio"}} />
                 
                 
 
@@ -270,19 +414,15 @@ export default function SiteCustomiser(componentProps){
                 <div 
                 style={{marginLeft:"15%"}}
                 >
-                Cache time (seconds):
                 </div>
 
-                <MultipleRadionInputs input={ {options:["1","2","3","22"], prop: "browserCacheTime" , name:"Site site runs (for the statistics page only):",  type:"radio"}}/>
+                <MultipleRadionInputs input={ {options:[["2", "first 2 runs"], ["50%", "50% of the runs"],["75%", "75% of the runs"], ["100%","whole test"]], prop: "browserCacheTime" , name:"Site site runs (for the statistics page only):",  type:"radio"}}/>
 
 
             </div>
         </div>
 
         
-        <div  className="sep">
-        Use Blob images from DB 
-        </div>
 
         <div className="sep">
             <div className="element-title"> 
@@ -310,9 +450,6 @@ export default function SiteCustomiser(componentProps){
                 File
             </label>
 
-            <div>Blobs are binary data objects, stored directtly in the database </div>
-            <div>Files are stored in the file system, and the database stores a reference to them</div>
-
         </div>
 
 
@@ -326,13 +463,13 @@ export default function SiteCustomiser(componentProps){
                 />
             </div>
 
-            <div>
+            {/* <div>
             Generate fully rendered HTML on the server
-            </div>
+            </div> */}
         </div>
         
         
-        <div className="sep"
+        {/* <div className="sep"
         style={{    
             // alignItems: "flex-start",
             // display: "flex",
@@ -349,7 +486,12 @@ export default function SiteCustomiser(componentProps){
                     <input
                     type="checkbox"
                     checked={props.minifyHTML}
-                    onChange={() => {        setProps({...props, minifyHTML:!props.minifyHTML });   }}
+                    onChange={() => {        
+
+                        setProps({...props, minifyHTML:!props.minifyHTML });   
+                        componentProps.setSiteUrl( (prop)=>({...prop,  minifyHTML:!props.minifyHTML }))
+
+                    }}
                     />
                 HTML
                 </label>
@@ -358,7 +500,11 @@ export default function SiteCustomiser(componentProps){
                     <input
                     type="checkbox"
                     checked={props.minifyCSS}
-                    onChange={() => {        setProps({...props, minifyCSS:!props.minifyCSS });   }}
+                    onChange={() => {        
+                        setProps({...props, minifyCSS:!props.minifyCSS });   
+                        componentProps.setSiteUrl( (prop)=>({...prop,  minifyCSS:!props.minifyCSS }))
+
+                    }}
                     />
                 CSS
                 </label>
@@ -368,7 +514,11 @@ export default function SiteCustomiser(componentProps){
                     <input
                     type="checkbox"
                     checked={props.minifyJS}
-                    onChange={() => {        setProps({...props, minifyJS:!props.minifyJS });   }}
+                    onChange={() => {        
+                        setProps({...props, minifyJS:!props.minifyJS });   
+                        componentProps.setSiteUrl( (prop)=>({...prop,  minifyJS:!props.minifyJS }))
+                    
+                    }}
                     />
                 JS
                 </label>
@@ -376,26 +526,26 @@ export default function SiteCustomiser(componentProps){
 
 
 
+        </div> */}
+
+
+            {/* Render all added options */}
+            {addedOptions.map((input, index) => 
+        <div className="sep" key={index}>
+            <MultipleRadionInputs input={input} />
         </div>
+        )}
 
-        <div className="sep">
-            <div className="element-title"> 
-
-                Compress Images 
-
-                GREAT IDEA WOULD BE TO ALSO GIVE STATS ON MEMORY USAGE AND CPU USAGE
-            </div>
-            
-        </div>
+        <AddOptionList />
 
 
 
-        Chosen props: {JSON.stringify(props)}
+        {/* Chosen props: {JSON.stringify(props)} */}
 
     </div>
     {/* <hr/>    */}
 
-
+{/* 
     maybe here a button pointing to th built url(or we just return it) 
 
     { 
@@ -404,7 +554,7 @@ export default function SiteCustomiser(componentProps){
         baseUrl = "path to react?"
     }
 
-    {baseUrl + new URLSearchParams(props)}
+    {baseUrl + new URLSearchParams(props)} */}
 
     </>)
 

@@ -80,10 +80,60 @@ function modifyLighthouseConfig(config) {
   // delete config.upload.target;
 }
 
+
+async function clearBackendCache( numberOfResults) {
+
+  const url = `https://localhost:7080/api/Clothes?numberOfResults=${numberOfResults}&testNumber=-1`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      console.log('Clothes deleted successfully.');
+    } else {
+      console.log('Failed to delete clothes. Status:', response.status);
+    }
+  } catch (error) {
+    console.error('An error occurred while deleting clothes:', error);
+  }
+
+}
+
+
+
+
+
+
+function getIterations( param, runs )
+{
+      // checking if we got percentafe or the iteration number
+    if (param.includes("%"))
+      result =  parseInt(parseInt(param)*parseInt(runs) / 100);
+    else
+      result =  parseInt(param);
+
+    
+    if (result > runs)
+      return runs;
+
+    return result;
+}
+
+
+
+
+
+
+
+
 module.exports = {
   updateLighthouseConfig,
   modifyLighthouseConfig,
-  runLighthouseCI
+  runLighthouseCI,
+  clearBackendCache,
+  getIterations
 };
 
 
