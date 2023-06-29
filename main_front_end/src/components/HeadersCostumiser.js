@@ -139,35 +139,45 @@ const AddOptionList = () => {
 
         return (
             <div className="sep">
-        
+
             <div className="element-title"> 
+
                 {input.name}
-            </div>
-        
+            </ div>
+
+
             {input.options.map((option) => {
                 const optionValue = Array.isArray(option) ? option[0] : option;
                 const optionLabel = Array.isArray(option) ? option[1] : option;
-        
+
                 return (
                     <label key={optionValue}>
                         <input
                             type={input.type}
                             name={input.prop}
                             value={optionValue}
-                            checked={props[input.prop] ? props[input.prop].includes(optionValue) : false}
+                            checked={input.type ==="radio" ?  props[input.prop] === optionValue: props[input.prop] ? props[input.prop].includes(optionValue) : false}
                             onChange={(event) => {
-                                let newArray = Array.isArray(props[input.prop]) ? [...props[input.prop]] : [];
-                                if (event.target.checked) {
-                                    newArray.push(optionValue);
-                                } else {
-                                    newArray = newArray.filter(value => value !== optionValue);
+
+                                if (input.type ==="radio") 
+                                {setProps({...props, [input.prop]: event.target.value});
+                                componentProps.setSiteUrl( (prop)=>({...prop,  [input.prop]:event.target.value}))
+                                }else {
+                                    let newArray = Array.isArray(props[input.prop]) ? [...props[input.prop]] : [];
+                                    if (event.target.checked) {
+                                        newArray.push(optionValue);
+                                    } else {
+                                        newArray = newArray.filter(value => value !== optionValue);
+                                    }
+                                
+                                    setProps({...props, [input.prop]: newArray});
+                                    componentProps.setSiteUrl( (prop) => ({...prop, [input.prop]: newArray}))
+                                
                                 }
-                            
-                                setProps({...props, [input.prop]: newArray});
-                                componentProps.setSiteUrl( (prop) => ({...prop, [input.prop]: newArray}))
+
                             }}
-                            
                         />
+
                         {optionLabel}
                     </label>
                 );

@@ -17,11 +17,12 @@
     using System.Collections.Generic;
     using Microsoft.Extensions.Caching.Memory;
 
+    using DotNetEnv;
 
 
 
 
-    namespace webapi.Controllers
+namespace webapi.Controllers
     {
         [ApiController]
         [Route("api/[controller]")]
@@ -59,15 +60,20 @@
 
 
 
+        [HttpGet("get_container_id")]
+        public async Task<string> GetContainerId()
+        {
+            return "StoreBE";
+        }
+
+
 
         [HttpGet]
 /*        [ResponseCache(Duration = 30, VaryByQueryKeys = new[] { "numberOfResults", "testNumber" })]*/
         public IEnumerable<Clothes> GetClothes(int numberOfResults, int testNumber = -1)
         {
 
-            /*string connectionString = "server=localhost;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";*/
-
-            string connectionString = "server=host.docker.internal;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";
+            string connectionString = Environment.GetEnvironmentVariable("connectionString");
 
 
             MySqlConnection connection = new MySqlConnection(connectionString);
@@ -156,7 +162,7 @@
             }
 
 
-            string connectionString = "server=host.docker.internal;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";
+            string connectionString = Environment.GetEnvironmentVariable("connectionString");
 
             MySqlConnection connection = new MySqlConnection(connectionString);
 

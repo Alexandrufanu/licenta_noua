@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.SpaServices.Prerendering;
 
 using System.Collections.Generic;
 
+using DotNetEnv;
 
 using Docker.DotNet;
 using Docker.DotNet.Models;
@@ -96,9 +97,7 @@ namespace webapi.Controllers
         public IEnumerable<Item> GetItem(int numberOfResults, int testNumber = -1)
         {
 
-            /*string connectionString = "server=localhost;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";*/
-
-            string connectionString = "server=host.docker.internal;user=root;database=learning_platform_with;port=3306;password=Numaistiuparole";
+            string connectionString = Environment.GetEnvironmentVariable("connectionString");
 
 
             MySqlConnection connection = new MySqlConnection(connectionString);
@@ -232,7 +231,7 @@ namespace webapi.Controllers
                 return cachedClothes;
             }
 
-            string connectionString = "server=host.docker.internal;user=root;database=store_w_paths;port=3306;password=Numaistiuparole";
+            string connectionString = Environment.GetEnvironmentVariable("connectionString");
 
             MySqlConnection connection = new MySqlConnection(connectionString);
 

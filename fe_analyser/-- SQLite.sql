@@ -1,7 +1,0 @@
--- SQLite
-
-
-DELETE FROM builds;
-
-
-
